@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة القيادة المالية — جراند بلازا | صيانة كمبوند لاميرادا 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#122420;
+    --ink-2:#193631;
+    --ink-3:#1f423b;
+    --paper:#f1e9d2;
+    --paper-dim:#cfc4a4;
+    --gold:#c9a227;
+    --gold-soft:#e4c766;
+    --red:#b5432f;
+    --red-soft:#d97a66;
+    --teal:#6fa393;
+    --line: rgba(241,233,210,0.14);
+    --line-strong: rgba(241,233,210,0.28);
+    --shadow: 0 18px 40px -20px rgba(0,0,0,0.55);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 500px at 85% -10%, rgba(201,162,39,0.10), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(111,163,147,0.10), transparent 60%),
+      var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .mono{ font-family:'IBM Plex Mono','IBM Plex Sans Arabic',monospace; direction:ltr; unicode-bidi:isolate; }
+  .wrap{ max-width:1320px; margin:0 auto; padding:28px 24px 60px; }
+
+  /* ---------- Ledger paper texture (subtle horizontal rules) ---------- */
+  .ledger-tex{
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 27px,
+      var(--line) 27px, var(--line) 28px
+    );
+  }
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    padding-bottom:22px; margin-bottom:26px; border-bottom:1px solid var(--line-strong);
+    flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:18px; }
+  .stamp{ width:78px; height:78px; flex:none; }
+  .brand-text .eyebrow{
+    font-size:12.5px; letter-spacing:.14em; color:var(--gold-soft); text-transform:none;
+    font-weight:600; margin-bottom:4px;
+  }
+  h1{
+    font-family:'Aref Ruqaa', serif; font-weight:700; font-size:30px; margin:0 0 4px;
+    color:var(--paper); letter-spacing:.01em;
+  }
+  .brand-text .sub{ font-size:14px; color:var(--paper-dim); }
+  .meta-badges{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .badge{
+    border:1px solid var(--line-strong); border-radius:999px; padding:7px 16px;
+    font-size:12.5px; color:var(--paper-dim); background:rgba(241,233,210,0.04);
+    display:flex; align-items:center; gap:8px; white-space:nowrap;
+  }
+  .badge b{ color:var(--gold-soft); font-weight:600; }
+  .badge .dot{ width:6px;height:6px;border-radius:50%; background:var(--red-soft); box-shadow:0 0 0 3px rgba(181,67,47,0.18); }
+
+  /* ---------- Section labels ---------- */
+  .section-head{ display:flex; align-items:baseline; gap:12px; margin:44px 0 16px; }
+  .section-head .num{ font-family:'IBM Plex Mono'; font-size:12px; color:var(--gold); letter-spacing:.08em; }
+  .section-head h2{ font-size:19px; margin:0; font-weight:600; color:var(--paper); }
+  .section-head .rule{ flex:1; height:1px; background:var(--line-strong); }
+
+  /* ---------- KPI grid ---------- */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .kpi{
+    background: linear-gradient(180deg, var(--ink-3), var(--ink-2));
+    border:1px solid var(--line); border-radius:10px; padding:18px 18px 16px;
+    box-shadow: var(--shadow); position:relative; overflow:hidden;
+  }
+  .kpi::before{
+    content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:3px;
+    background:var(--gold);
+  }
+  .kpi.neg::before{ background:var(--red-soft); }
+  .kpi .label{ font-size:12.5px; color:var(--paper-dim); margin-bottom:10px; }
+  .kpi .value{ font-family:'IBM Plex Mono'; font-size:24px; font-weight:600; color:var(--gold-soft); direction:ltr; unicode-bidi:isolate; }
+  .kpi.neg .value{ color:var(--red-soft); }
+  .kpi .unit{ font-size:12px; color:var(--paper-dim); margin-inline-start:6px; font-family:'IBM Plex Sans Arabic'; }
+  .kpi .foot{ font-size:11.5px; color:var(--paper-dim); margin-top:8px; opacity:.8; }
+
+  /* ---------- Panels / cards ---------- */
+  .panel{
+    background: linear-gradient(180deg, var(--ink-3), var(--ink-2));
+    border:1px solid var(--line); border-radius:10px; padding:22px;
+    box-shadow: var(--shadow);
+  }
+  .panel h3{ margin:0 0 4px; font-size:15.5px; font-weight:600; color:var(--paper); }
+  .panel .cap{ font-size:12px; color:var(--paper-dim); margin-bottom:16px; }
+
+  .grid-2-1{ display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .grid-1-1-1{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+  canvas{ max-width:100%; }
+
+  /* ---------- Ledger table ---------- */
+  .ledger-scroll{ overflow-x:auto; }
+  table.ledger{ width:100%; border-collapse:collapse; font-size:13px; min-width:920px; }
+  table.ledger th, table.ledger td{ padding:9px 10px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap; }
+  table.ledger th{ color:var(--gold-soft); font-weight:600; font-size:12px; }
+  table.ledger td:first-child, table.ledger th:first-child{ text-align:right; position:sticky; right:0; background:var(--ink-2); min-width:230px; white-space:normal; }
+  table.ledger tr.section-row td{ text-align:right; color:var(--gold-soft); font-weight:600; background:rgba(201,162,39,0.06); }
+  table.ledger tr.total-row td{ font-weight:700; color:var(--paper); border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong); }
+  table.ledger td.num{ font-family:'IBM Plex Mono'; direction:ltr; }
+  .neg-txt{ color:var(--red-soft); }
+  .pos-txt{ color:var(--gold-soft); }
+
+  /* ---------- Ratio list ---------- */
+  ul.ratios{ list-style:none; margin:0; padding:0; }
+  ul.ratios li{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0; border-bottom:1px dashed var(--line);
+    font-size:13px; color:var(--paper-dim);
+  }
+  ul.ratios li:last-child{ border-bottom:none; }
+  ul.ratios li b{ font-family:'IBM Plex Mono'; color:var(--gold-soft); font-weight:600; direction:ltr; unicode-bidi:isolate; }
+  ul.ratios li b.neg{ color:var(--red-soft); }
+
+  .legend-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .legend-list .row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--paper-dim); }
+  .legend-list .sw{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .legend-list .row b{ margin-inline-start:auto; font-family:'IBM Plex Mono'; color:var(--paper); direction:ltr; }
+
+  footer{ margin-top:50px; padding-top:20px; border-top:1px solid var(--line-strong); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--paper-dim); }
+
+  @media (max-width: 980px){
+    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
+    .grid-2-1, .grid-3, .grid-1-1-1{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 560px){
+    .kpi-grid{ grid-template-columns:1fr 1fr; }
+    h1{ font-size:22px; }
+    .meta-badges{ justify-content:flex-start; }
+  }
+
+  ::-webkit-scrollbar{ height:8px; width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--line-strong); border-radius:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg class="stamp" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#c9a227" stroke-width="1.4" stroke-dasharray="2.4 3.2"/>
+        <circle cx="50" cy="50" r="38" fill="none" stroke="#c9a227" stroke-width="1"/>
+        <path id="stampCircleTop" d="M 50 12 A 38 38 0 0 1 88 50" fill="none"/>
+        <text font-family="Aref Ruqaa" font-size="8.6" fill="#e4c766" letter-spacing="1">
+          <textPath href="#stampCircleTop" startOffset="2">جراند بلازا للاستثمار العقاري</textPath>
+        </text>
+        <path id="stampCircleBottom" d="M 88 50 A 38 38 0 0 1 12 50" fill="none"/>
+        <text font-family="Aref Ruqaa" font-size="8.6" fill="#e4c766" letter-spacing="1">
+          <textPath href="#stampCircleBottom" startOffset="2">قسم صيانة كمبوند لاميرادا</textPath>
+        </text>
+        <text x="50" y="46" text-anchor="middle" font-family="Aref Ruqaa" font-size="17" fill="#c9a227" font-weight="700">2026</text>
+        <text x="50" y="62" text-anchor="middle" font-family="IBM Plex Sans Arabic" font-size="8" fill="#e4c766">تقرير مالي سنوي</text>
+      </svg>
+      <div class="brand-text">
+        <div class="eyebrow">تقرير الأداء المالي — السنة المالية 2026</div>
+        <h1>لوحة القيادة المالية</h1>
+        <div class="sub">شركة جراند بلازا للاستثمار العقاري والسياحي · قسم الصيانة، كمبوند لاميرادا</div>
+      </div>
+    </div>
+    <div class="meta-badges">
+      <div class="badge">الفترة المرصودة <b>يناير – يوليو 2026</b></div>
+      <div class="badge">وحدة القياس <b>الجنيه المصري (EGP)</b></div>
+      <div class="badge"><span class="dot"></span> صافي النشاط <b class="mono">خسارة</b></div>
+    </div>
+  </header>
+
+  <!-- KPI GRID -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="label">إجمالي الإيرادات التشغيلية</div>
+      <div class="value">1,415,870<span class="unit">جنيه</span></div>
+      <div class="foot">7 أشهر مرصودة من 12</div>
+    </div>
+    <div class="kpi neg">
+      <div class="label">إجمالي المصروفات (مباشرة + إدارية)</div>
+      <div class="value">7,040,261<span class="unit">جنيه</span></div>
+      <div class="foot">مباشرة 6,669,326 + إدارية 370,935</div>
+    </div>
+    <div class="kpi neg">
+      <div class="label">صافي نتيجة النشاط</div>
+      <div class="value">(5,624,390)<span class="unit">جنيه</span></div>
+      <div class="foot">خسارة تشغيلية تراكمية</div>
+    </div>
+    <div class="kpi neg">
+      <div class="label">هامش الخسارة التشغيلية الصافي</div>
+      <div class="value">397.3%<span class="unit">من الإيرادات</span></div>
+      <div class="foot">المصروفات 4.97× الإيرادات</div>
+    </div>
+    <div class="kpi">
+      <div class="label">إجمالي السيولة المتاحة</div>
+      <div class="value">249,457<span class="unit">جنيه</span></div>
+      <div class="foot">خزينة + بنك ABC</div>
+    </div>
+    <div class="kpi">
+      <div class="label">أشهر تغطية النقدية للمصروفات</div>
+      <div class="value">1.91<span class="unit">شهر</span></div>
+      <div class="foot">عند متوسط الإنفاق الشهري الحالي</div>
+    </div>
+    <div class="kpi">
+      <div class="label">نسبة تحصيل الوحدات</div>
+      <div class="value">26.6%<span class="unit">من الوحدات</span></div>
+      <div class="foot">من إجمالي وحدات الكمبوند</div>
+    </div>
+    <div class="kpi">
+      <div class="label">تحصيلات فروق الصيانة</div>
+      <div class="value">2,269,247<span class="unit">جنيه</span></div>
+      <div class="foot">حركة تحصيل تراكمية 2026</div>
+    </div>
+  </div>
+
+  <!-- TREND + BREAKDOWNS -->
+  <div class="section-head"><span class="num">01</span><h2>الإيرادات والمصروفات — الاتجاه الشهري</h2><span class="rule"></span></div>
+  <div class="grid-2-1">
+    <div class="panel">
+      <h3>الإيرادات مقابل المصروفات شهرياً</h3>
+      <div class="cap">جنيه مصري · يناير – يوليو 2026 (لا توجد حركة مرصودة من أغسطس)</div>
+      <canvas id="trendChart" height="230"></canvas>
+    </div>
+    <div class="panel">
+      <h3>هيكل التكلفة</h3>
+      <div class="cap">توزيع بنود المصروفات الرئيسية</div>
+      <canvas id="expenseDonut" height="230"></canvas>
+      <div class="legend-list" id="expenseLegend"></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:16px;">
+    <div class="panel">
+      <h3>مصادر الإيرادات التشغيلية</h3>
+      <div class="cap">% من إجمالي الإيرادات (باستثناء فروق الصيانة)</div>
+      <canvas id="revenueBar" height="220"></canvas>
+    </div>
+    <div class="panel">
+      <h3>اتجاه تحصيلات فروق الصيانة</h3>
+      <div class="cap">حركة التحصيل الشهرية — جنيه مصري</div>
+      <canvas id="collectionsTrend" height="220"></canvas>
+    </div>
+    <div class="panel">
+      <h3>تحصيلات فروق الصيانة حسب المصدر</h3>
+      <div class="cap">توزيع 2,269,247 جنيه حسب جهة التحصيل</div>
+      <canvas id="collectionsSource" height="180"></canvas>
+      <div class="legend-list" id="sourceLegend"></div>
+    </div>
+  </div>
+
+  <!-- INCOME STATEMENT -->
+  <div class="section-head"><span class="num">02</span><h2>قائمة الدخل التشغيلية — 2026</h2><span class="rule"></span></div>
+  <div class="panel">
+    <h3>البيان الشهري الكامل</h3>
+    <div class="cap">شركة جراند بلازا — قسم صيانة كمبوند لاميرادا · جميع القيم بالجنيه المصري</div>
+    <div class="ledger-scroll">
+      <table class="ledger" id="incomeTable">
+        <thead>
+          <tr>
+            <th>البيان</th><th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th><th>يوليو</th><th>الإجمالي</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CASH & RATIOS -->
+  <div class="section-head"><span class="num">03</span><h2>السيولة والمؤشرات المالية</h2><span class="rule"></span></div>
+  <div class="grid-1-1-1">
+    <div class="panel">
+      <h3>المركز النقدي الحالي</h3>
+      <div class="cap">توزيع السيولة المتاحة</div>
+      <canvas id="cashDonut" height="200"></canvas>
+      <ul class="ratios" style="margin-top:14px;">
+        <li>رصيد الخزينة الرأسية <b>30,905</b></li>
+        <li>رصيد بنك ABC <b>218,552</b></li>
+        <li>إجمالي النقدية <b>249,457</b></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>مؤشرات الربحية والتكلفة</h3>
+      <div class="cap">نسب محسوبة على أساس إجمالي 2026</div>
+      <ul class="ratios">
+        <li>هامش الخسارة الإجمالي (مجمل الربح / الإيرادات) <b class="neg">-371.0%</b></li>
+        <li>هامش الخسارة التشغيلية الصافي <b class="neg">-397.3%</b></li>
+        <li>نسبة إجمالي المصروفات إلى الإيرادات <b class="neg">497.2%</b></li>
+        <li>نسبة الأجور والمرتبات إلى إجمالي المصروفات <b>30.5%</b></li>
+        <li>نسبة أعمال المقاولين إلى إجمالي المصروفات <b>28.5%</b></li>
+        <li>نسبة استهلاك الكهرباء إلى إجمالي المصروفات <b>11.9%</b></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>السيولة والتحصيل</h3>
+      <div class="cap">مؤشرات التدفق النقدي وتحصيل العملاء</div>
+      <ul class="ratios">
+        <li>إجمالي المقبوضات خلال الفترة <b>10,107,332</b></li>
+        <li>إجمالي المدفوعات خلال الفترة <b>9,450,562</b></li>
+        <li>صافي التدفق النقدي <b>656,770</b></li>
+        <li>نسبة البنك من إجمالي النقدية <b>87.6%</b></li>
+        <li>نسبة الوحدات المسددة فروق الصيانة بالفترة <b>25.0%</b></li>
+        <li>متوسط التحصيل لكل وحدة عن فروق الصيانة <b>324,178</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>مصدر البيانات: دفاتر قسم الصيانة — شركة جراند بلازا للاستثمار العقاري والسياحي، كمبوند لاميرادا.</span>
+    <span>الأرقام بالجنيه المصري، مقربة لأقرب جنيه ما لم يُذكر غير ذلك.</span>
+  </footer>
+
+</div>
+
+<script>
+Chart.defaults.font.family = "'IBM Plex Sans Arabic', sans-serif";
+Chart.defaults.color = '#cfc4a4';
+Chart.defaults.borderColor = 'rgba(241,233,210,0.10)';
+
+const GOLD = '#c9a227', GOLD_SOFT='#e4c766', RED='#b5432f', RED_SOFT='#d97a66', TEAL='#6fa393', PAPER='#f1e9d2';
+const palette = ['#c9a227','#6fa393','#b5432f','#8a6b9a','#4f8ba0','#d9a66a','#7a8f5c','#c98a6b','#5c7fa0','#a25c6b','#8fae7a','#b6975e','#5f6f7f','#c9c2a0','#9a6f9a','#6b8fa5','#a5865c'];
+
+/* ---------------- data ---------------- */
+const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو"];
+const revenue  = [241066.06,228489.49,72266.85,214763.97,235776.69,220752.47,202755.23];
+const expenses = [783005.72,988494.38,894736.283,1243465.7,1443397.33,992940.56,694220.87];
+const collections = [544589.22,249184.53,123861.91,371828.03,246056.06,446577.63,287149.96];
+
+const expenseCats = [
+  ["أجور ومرتبات وبدلات",2148728],
+  ["المقاولين",2006908],
+  ["حراسة وأمن",1041323],
+  ["استهلاك كهرباء",836964],
+  ["استهلاك مياه",496169],
+  ["مشتريات عامة",163955.43],
+  ["موردين",105823],
+  ["صرف نسب",51743],
+  ["مصروفات نثرية",42499],
+  ["أعمال صيانة",33411.15],
+  ["مكافآت",30690],
+  ["بدل انتقالات",22459],
+  ["منح",14200],
+  ["ضيافة وبوفيه وأدوية طوارئ",13969.43],
+  ["مصروفات متنوعة",13613],
+  ["وقود وزيوت",13030],
+  ["مصروفات بنكية",4775.83]
+];
+
+const revenueCats = [
+  ["فوائد بنكية",1218236.06],
+  ["إيرادات متنوعة",80670],
+  ["غسيل سيارات",51170],
+  ["صيانة الحدائق",20764.55],
+  ["دش مركزي",10000],
+  ["أعمال سباكة",7945],
+  ["خدمات معاونة",9648.28],
+  ["غرامات",3500],
+  ["أعمال كهرباء",3050]
+];
+
+const sourceCats = [
+  ["بنك ABC",1126912.34],
+  ["خزينة رأسية",735022],
+  ["خزينة فرعية",214490],
+  ["قناة السويس",165048],
+  ["بنك CIB",27775]
+];
+
+function fmt(n, d=0){
+  const neg = n < 0;
+  const v = Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d});
+  return neg ? '('+v+')' : v;
+}
+
+/* ---------------- trend chart ---------------- */
+new Chart(document.getElementById('trendChart'), {
+  type:'bar',
+  data:{
+    labels: months,
+    datasets:[
+      { label:'الإيرادات', data:revenue, backgroundColor:'rgba(201,162,39,0.75)', borderRadius:4, order:2, barPercentage:.55 },
+      { label:'المصروفات', type:'line', data:expenses, borderColor:RED_SOFT, backgroundColor:'rgba(181,67,47,0.18)', fill:true, tension:.35, pointBackgroundColor:RED_SOFT, pointRadius:3, order:1, borderWidth:2 }
+    ]
+  },
+  options:{
+    responsive:true,
+    interaction:{ mode:'index', intersect:false },
+    plugins:{
+      legend:{ position:'top', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true } },
+      tooltip:{ callbacks:{ label:(c)=> c.dataset.label+': '+fmt(c.raw)+' جنيه' } }
+    },
+    scales:{
+      x:{ grid:{ display:false } },
+      y:{ grid:{ color:'rgba(241,233,210,0.08)' }, ticks:{ callback:(v)=> (v/1000)+'k' } }
+    }
+  }
+});
+
+/* ---------------- expense donut ---------------- */
+const expTop = expenseCats.slice(0,6);
+const expOtherSum = expenseCats.slice(6).reduce((a,b)=>a+b[1],0);
+const expChartData = [...expTop, ["أخرى", expOtherSum]];
+new Chart(document.getElementById('expenseDonut'), {
+  type:'doughnut',
+  data:{
+    labels: expChartData.map(x=>x[0]),
+    datasets:[{ data: expChartData.map(x=>x[1]), backgroundColor: palette, borderColor: '#193631', borderWidth:2 }]
+  },
+  options:{ plugins:{ legend:{ display:false } }, cutout:'62%',
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> c.label+': '+fmt(c.raw)+' جنيه' } } } }
+});
+const expTotal = expenseCats.reduce((a,b)=>a+b[1],0);
+document.getElementById('expenseLegend').innerHTML = expChartData.map((x,i)=>
+  `<div class="row"><span class="sw" style="background:${palette[i]}"></span>${x[0]}<b>${(x[1]/expTotal*100).toFixed(1)}%</b></div>`
+).join('');
+
+/* ---------------- revenue bar ---------------- */
+new Chart(document.getElementById('revenueBar'), {
+  type:'bar',
+  data:{
+    labels: revenueCats.map(x=>x[0]),
+    datasets:[{ data: revenueCats.map(x=>x[1]), backgroundColor: palette, borderRadius:4 }]
+  },
+  options:{
+    indexAxis:'y',
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> fmt(c.raw)+' جنيه' } } },
+    scales:{ x:{ grid:{ color:'rgba(241,233,210,0.08)' }, ticks:{ callback:(v)=> (v/1000)+'k' } }, y:{ grid:{ display:false } } }
+  }
+});
+
+/* ---------------- collections trend ---------------- */
+new Chart(document.getElementById('collectionsTrend'), {
+  type:'line',
+  data:{
+    labels: months,
+    datasets:[{ label:'فروق الصيانة', data: collections, borderColor: GOLD_SOFT, backgroundColor:'rgba(201,162,39,0.18)', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:GOLD_SOFT, borderWidth:2 }]
+  },
+  options:{
+    plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> fmt(c.raw)+' جنيه' } } },
+    scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(241,233,210,0.08)' }, ticks:{ callback:(v)=> (v/1000)+'k' } } }
+  }
+});
+
+/* ---------------- collections by source ---------------- */
+new Chart(document.getElementById('collectionsSource'), {
+  type:'doughnut',
+  data:{
+    labels: sourceCats.map(x=>x[0]),
+    datasets:[{ data: sourceCats.map(x=>x[1]), backgroundColor: [TEAL,GOLD,'#8a6b9a',RED_SOFT,'#4f8ba0'], borderColor:'#193631', borderWidth:2 }]
+  },
+  options:{ cutout:'58%', plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.label+': '+fmt(c.raw)+' جنيه' } } } }
+});
+const srcTotal = sourceCats.reduce((a,b)=>a+b[1],0);
+const srcColors = [TEAL,GOLD,'#8a6b9a',RED_SOFT,'#4f8ba0'];
+document.getElementById('sourceLegend').innerHTML = sourceCats.map((x,i)=>
+  `<div class="row"><span class="sw" style="background:${srcColors[i]}"></span>${x[0]}<b>${(x[1]/srcTotal*100).toFixed(1)}%</b></div>`
+).join('');
+
+/* ---------------- cash donut ---------------- */
+new Chart(document.getElementById('cashDonut'), {
+  type:'doughnut',
+  data:{
+    labels:['بنك ABC','الخزينة الرأسية'],
+    datasets:[{ data:[218552, 30905], backgroundColor:[GOLD, TEAL], borderColor:'#193631', borderWidth:2 }]
+  },
+  options:{ cutout:'64%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10 } }, tooltip:{ callbacks:{ label:(c)=> c.label+': '+fmt(c.raw)+' جنيه' } } } }
+});
+
+/* ---------------- income statement table ---------------- */
+const rows = [
+  {t:'section', label:'إجمالي الإيرادات التشغيلية'},
+  {label:'إجمالي الإيرادات التشغيلية', vals:[241066.06,228489.49,72266.85,214763.97,235776.69,220752.47,202755.23], strong:true},
+  {t:'section', label:'يُخصم: المصروفات التشغيلية المباشرة'},
+  {label:'أجور ومرتبات وبدلات', vals:[192575,355785,352080,332836,427685,247605,240162]},
+  {label:'مقاولو الخدمات (المقاولين)', vals:[198483,232132,209135,486740,457128,267733,155557]},
+  {label:'موردين', vals:[0,7900,15800,29850,30323,21950,0]},
+  {label:'حراسة وأمن', vals:[170643,137105,0,206666,282831,0,244078]},
+  {label:'استهلاك كهرباء', vals:[16150,121361,241841,121871,13731,306225,15785]},
+  {label:'استهلاك مياه', vals:[164230,105741,0,13250,127167,85781,0]},
+  {label:'أعمال صيانة', vals:[1470,3522.15,0,2500,11514,13755,650]},
+  {t:'total', label:'إجمالي تكلفة النشاط المباشرة', vals:[743551,963546.15,818856,1193713,1350379,943049,656232]},
+  {t:'total', label:'مجمل الربح (الخسارة)', vals:[-502484.94,-735056.66,-746589.15,-978949.03,-1114602.31,-722296.53,-453476.77]},
+  {t:'section', label:'يُخصم: المصروفات الإدارية والعمومية'},
+  {label:'مشتريات عامة', vals:[16473.06,13609.85,30451.283,12442.7,54374.17,21928,14676.37]},
+  {label:'مصروفات نثرية', vals:[9613,800,10790,800,8546,11550,400]},
+  {label:'صرف نسب (عمولات)', vals:[4378,5506,6770,7867.5,3958,6759,16504.5]},
+  {label:'بدل انتقالات', vals:[2450,2740,1180,12500,1480,650,1459]},
+  {label:'ضيافة وبوفيه وأدوية طوارئ', vals:[2742.2,2060.9,834,944.5,1975.83,4793,619]},
+  {label:'مصروفات متنوعة', vals:[100,0,0,9638,0,3875,0]},
+  {label:'مصروفات بنكية', vals:[958.46,231.48,2555,210,274.33,336.56,210]},
+  {label:'وقود وزيوت', vals:[2740,0,3800,0,2370,0,4120]},
+  {label:'منح', vals:[0,0,3000,0,11200,0,0]},
+  {label:'مكافآت', vals:[0,0,16500,5350,8840,0,0]},
+  {t:'total', label:'إجمالي المصروفات الإدارية والعمومية', vals:[39454.72,24948.23,75880.283,49752.7,93018.33,49891.56,37988.87]},
+  {t:'total', label:'صافي نتيجة النشاط (الربح / الخسارة)', vals:[-541939.66,-760004.89,-822469.433,-1028701.73,-1207620.64,-772188.09,-491465.64], strong:true},
+];
+
+const tbody = document.querySelector('#incomeTable tbody');
+tbody.innerHTML = rows.map(r=>{
+  if(r.t==='section'){
+    return `<tr class="section-row"><td colspan="9">${r.label}</td></tr>`;
+  }
+  const total = r.vals ? r.vals.reduce((a,b)=>a+b,0) : null;
+  const cells = (r.vals||[]).map(v=>`<td class="num ${v<0?'neg-txt':''}">${fmt(v)}</td>`).join('');
+  const totalCell = total!==null ? `<td class="num ${total<0?'neg-txt':'pos-txt'}">${fmt(total)}</td>` : '';
+  const rowClass = r.t==='total' ? 'total-row' : '';
+  return `<tr class="${rowClass}"><td>${r.label}</td>${cells}${totalCell}</tr>`;
+}).join('');
+</script>
+</body>
+</html>
